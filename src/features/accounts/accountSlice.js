@@ -43,6 +43,8 @@ export function deposit(amount, currency) {
   if (currency === "USD") return { type: "account/deposit", payload: amount };
   return async function (dispatch, getState) {
     try {
+      // Set isLoading as true
+      dispatch(loading());
       // API call
       const res = await fetch(
         `https://${CURR_CONVERSION_URL}/latest?amount=${amount}&from=${currency}&to=USD`
