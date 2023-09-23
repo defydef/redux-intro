@@ -1,5 +1,5 @@
 const initialStateAccount = {
-  balance: 0,
+  balance: 10,
   loan: 0,
   loanPurpose: "",
 };
