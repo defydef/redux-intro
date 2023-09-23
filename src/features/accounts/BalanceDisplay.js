@@ -7,19 +7,27 @@ function formatCurrency(value) {
   }).format(value);
 }
 
-function BalanceDisplay({ balance }) {
-  // const account = useSelector((store) => store.account);
-  // useSelector((store) => store.customer);
-  // return <div className="balance">{formatCurrency(account.balance)}</div>;
-  return <div className="balance">{formatCurrency(balance)}</div>;
+function BalanceDisplay() {
+  const { balance, isLoading } = useSelector((store) => store.account);
+  useSelector((store) => store.customer);
+  return (
+    <div className="balance">
+      {isLoading ? "loading..." : formatCurrency(balance)}
+    </div>
+  );
+  // return (
+  //   <div className="balance">
+  //     {isLoading ? "loading..." : formatCurrency(balance)}
+  //   </div>
 }
 
-function mapStateToProps(state) {
-  return {
-    balance: state.account.balance,
-  };
-}
+// function mapStateToProps(state) {
+//   return {
+//     balance: state.account.balance,
+//   };
+// }
 
-export default connect(mapStateToProps)(BalanceDisplay);
+// export default connect(mapStateToProps)(BalanceDisplay);
+export default BalanceDisplay;
 // connect & mapStateToProps: legacy way to connect with Redux store
 // useSelector: modern way to connect with Redux store
