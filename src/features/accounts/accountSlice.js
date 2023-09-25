@@ -15,6 +15,7 @@ const accountSlice = createSlice({
   reducers: {
     deposit(state, action) {
       state.balance = state.balance + action.payload;
+      state.isLoading = false;
     },
     withdraw(state, action) {
       state.balance = state.balance - action.payload;
@@ -38,12 +39,36 @@ const accountSlice = createSlice({
       state.loan = 0;
       state.loanPurpose = "";
     },
+    loading(state) {
+      state.isLoading = true;
+    },
   },
 });
-console.log(accountSlice);
 
 export default accountSlice.reducer;
-export const { deposit, withdraw, requestLoan, payLoan } = accountSlice.actions;
+export const { withdraw, requestLoan, payLoan, loading } = accountSlice.actions;
+
+export function deposit(amount, currency) {
+  if (currency === "USD") return { type: "account/deposit", payload: amount };
+  return async function (dispatch, getState) {
+    try {
+      // Set isLoading as true
+      dispatch(loading());
+      // API call
+      const res = await fetch(
+        `https://${CURR_CONVERSION_URL}/latest?amount=${amount}&from=${currency}&to=USD`
+      );
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data.Response === "False") throw new Error();
+      const convertedAmount = data.rates.USD;
+      // return action
+      dispatch({ type: "account/deposit", payload: Number(convertedAmount) });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+}
 
 // export default function accountReducer(state = initialState, action) {
 //   switch (action.type) {
@@ -77,27 +102,6 @@ export const { deposit, withdraw, requestLoan, payLoan } = accountSlice.actions;
 //   }
 // }
 
-// export function deposit(amount, currency) {
-//   if (currency === "USD") return { type: "account/deposit", payload: amount };
-//   return async function (dispatch, getState) {
-//     try {
-//       // Set isLoading as true
-//       dispatch(loading());
-//       // API call
-//       const res = await fetch(
-//         `https://${CURR_CONVERSION_URL}/latest?amount=${amount}&from=${currency}&to=USD`
-//       );
-//       if (!res.ok) throw new Error();
-//       const data = await res.json();
-//       if (data.Response === "False") throw new Error();
-//       const convertedAmount = data.rates.USD;
-//       // return action
-//       dispatch({ type: "account/deposit", payload: Number(convertedAmount) });
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   };
-// }
 // export function withdraw(amount) {
 //   return { type: "account/withdraw", payload: amount };
 // }
